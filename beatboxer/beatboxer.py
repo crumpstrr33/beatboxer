@@ -197,6 +197,7 @@ class BeatBoxer:
                     AudioSegment.silent(beat_length - max_len - offset),
                     position=offset)
 
+        print(num_measures)
         self.current_beat = {
             'audio': beat, 'beats_per_measure': len(measure), 'bpm': self.bpm,
             'num_measures': num_measures, 'base_note': self.base_note}
@@ -253,7 +254,7 @@ def main():
     # Change to 100 beats per minute
     b.change_bpm(100)
     # Now have a time signature of 3/8 for 12 measures
-    b.make_a_beat(b.empty(3), num_measure=12, every_beat=['hihat'],
+    b.make_a_beat(b.empty(3), num_measures=12, every_beat=['hihat'],
         every_3rd=[('snare', 2), ('kick', 1)])
     b.store_beat('lastly dope')
 
