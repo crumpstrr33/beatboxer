@@ -1,6 +1,10 @@
 # Directories
 __pycache__
 outputs
+*.egg-info
+build
+dist
 
 # Files
 *.pyc
+*.zip

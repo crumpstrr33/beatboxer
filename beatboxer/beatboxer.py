@@ -7,7 +7,7 @@ from pydub import AudioSegment
 
 CUR_DIR = path.dirname(path.abspath(getsourcefile(lambda: 0)))
 ROOT = CUR_DIR[:CUR_DIR.rfind(path.sep)]
-ONESHOT_PATH = path.join(ROOT, 'samples')
+ONESHOT_PATH = path.join(ROOT, 'beatboxer', 'samples')
 SAVE_PATH = path.join(ROOT, 'outputs')
 
 
@@ -48,9 +48,11 @@ class BeatBoxer:
         # Print out info of what is saved in current beat
         if self.current_beat is not None:
             output = '---------Current Beat--------\n'
-            template = 'BPM: {} --- Beats per Measure: {} --- Number of Measures: {} --- Length: {} s'
+            template = 'BPM: {} --- Time Signature: {} --- Number of Measures: {} --- Length: {} s'
             output += template.format(self.current_beat['bpm'],
-                self.current_beat['beats_per_measure'], self.current_beat['num_measures'],
+                '{}/{}'.format(self.current_beat['beats_per_measure'],
+                               self.current_beat['base_note']),
+                self.current_beat['num_measures'],
                 round(self.current_beat['audio'].duration_seconds, 3))
             output += '\n\n'
 
@@ -197,7 +199,6 @@ class BeatBoxer:
                     AudioSegment.silent(beat_length - max_len - offset),
                     position=offset)
 
-        print(num_measures)
         self.current_beat = {
             'audio': beat, 'beats_per_measure': len(measure), 'bpm': self.bpm,
             'num_measures': num_measures, 'base_note': self.base_note}
