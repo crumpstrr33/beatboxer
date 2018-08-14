@@ -8,41 +8,45 @@ What uses does this have you ask me? Lots! Quickly supply dope beats for rap bat
 ## Example
 Here's an example ripped straight from the `main` function:
 ``` python
-  # Create object with 120 beats per minute and quarter note as one beat
-  b = BeatBoxer(bpm=120, base_note=4)
+    from inspect import getsourcefile
+    from os import path
 
-  # Create audio with 16 beats off an empty template for one measure:
-  #     1) Every beat play a hihat
-  #     2) Every 4th beat starting on the 2nd beat plays a snare
-  #     3) Every 3rd beat starting on the 2nd beat plays a snare
-  #     4) Every 8th beat starting on the 1st beat plays a crash
-  # Time signature will be 16/4
-  b.make_a_beat(b.empty(), num_measures=1, every_beat=['hihat'],
-      every_4th=[('snare', 1)], every_3rd=[('kick', 1)], every_8th=[('crash', 0)])
-  b.store_beat('dope1')
+    # Create directory to save audio into
+    save = path.join(path.dirname(path.abspath(getsourcefile(lambda: 0))), 'outputs')
 
-  # Change to having an eight note as one beat
-  b.change_base_note(8)
-  # Create same thing as before but it will now be twice as fast with a 
-  # time signature of 16/8
-  b.make_a_beat(b.empty(), num_measures=1, every_beat=['hihat'],
-      every_4th=[('snare', 1)], every_3rd=[('kick', 1)], every_8th=[('crash', 0)])
-  b.store_beat('dope2')
+    # Create object with 120 beats per minute and quarter note as one beat
+    b = BeatBoxer(bpm=120, base_note=4, save_path=save)
 
-  # Change to 100 beats per minute
-  b.change_bpm(100)
-  # Now have a time signature of 3/8 for 12 measures
-  b.make_a_beat(b.empty(3), num_measures=12, every_beat=['hihat'],
-      every_3rd=[('snare', 2), ('kick', 1)])
-  b.store_beat('lastly dope')
+    # Create audio with 16 beats off an empty template for one measure:
+    #     1) Every beat play a hihat
+    #     2) Every 4th beat starting on the 2nd beat plays a snare
+    #     3) Every 3rd beat starting on the 2nd beat plays a snare
+    #     4) Every 8th beat starting on the 1st beat plays a crash
+    # Time signature will be 16/4
+    b.make_a_beat(b.empty(), num_measures=1, every_beat=['hihat'],
+        every_4th=[('snare', 1)], every_3rd=[('kick', 1)], every_8th=[('crash', 0)])
+    b.store_beat('dope1')
 
-  # Save all the stored beats
-  b.save_beat('dope1', b.stored_beats['dope1'])
-  b.save_beat('dope2', b.stored_beats['dope2'])
-  b.save_beat('lastly dope', b.stored_beats['lastly dope'])
+    # Change to having an eight note as one beat
+    b.change_base_note(8)
+    # Create same thing as before but it will now be twice as fast with a 
+    # time signature of 16/8 and played for 4 measures
+    b.make_a_beat(b.empty(), num_measures=4, every_beat=['hihat'],
+        every_4th=[('snare', 1)], every_3rd=[('kick', 1)], every_8th=[('crash', 0)])
+    b.store_beat('dope2')
 
-  # Printing the object will display the stored and current beat(s)
-  print(b)
+    # Change to 100 beats per minute
+    b.change_bpm(100)
+    # Now have a time signature of 3/8 for 12 measures
+    b.make_a_beat(b.empty(3), num_measures=12, every_beat=['hihat'],
+        every_3rd=[('snare', 2), ('kick', 1)])
+    b.store_beat('lastly dope')
+
+    # Save one of the beats
+    b.save_beat('dopest', b.stored_beats['dope2'])
+
+    # Printing the object will display the stored and current beat(s)
+    print(b)
 ```
 The output will be:
 ```

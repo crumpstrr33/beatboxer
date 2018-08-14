@@ -8,7 +8,6 @@ from pydub import AudioSegment
 CUR_DIR = path.dirname(path.abspath(getsourcefile(lambda: 0)))
 ROOT = CUR_DIR[:CUR_DIR.rfind(path.sep)]
 ONESHOT_PATH = path.join(ROOT, 'beatboxer', 'samples')
-SAVE_PATH = path.join(ROOT, 'outputs')
 
 
 class BeatBoxer:
@@ -21,7 +20,7 @@ class BeatBoxer:
         'bass': AudioSegment.from_wav(path.join(ONESHOT_PATH, 'bass.wav'))
     }
 
-    def __init__(self, bpm=130, base_note=4):
+    def __init__(self, bpm=130, base_note=4, save_path=None):
         """
         Can be used to create and save a beat created by oneshots imported and
         saved in self.oneshots.
@@ -31,12 +30,16 @@ class BeatBoxer:
         base_note - (default 4) Which note to consider as one beat. It's the
                     lower of the two number in a time signature. Must be a
                     multiple of 4 cause ain't none of that weird stuff...
+        save_path - (default None) The path to the directory to save to.
         """
-        if base_note % 4 or not base_note:
-            raise Exception('base_note must be a multiple of 4')
+        # Checks if power of two or is zero
+        if bool(base_note & (base_note - 1)) or not base_note:
+            raise Exception("base_note can't be {}. ".format(base_note) +
+                'It must be a power of 2.')
 
         self.bpm = bpm
         self.base_note = base_note
+        self.save_path = save_path
 
         # The internal BPM, takes into account the value of `base_note`
         self._bpm = (self.base_note//4) * self.bpm
@@ -201,10 +204,11 @@ class BeatBoxer:
 
         self.current_beat = {
             'audio': beat, 'beats_per_measure': len(measure), 'bpm': self.bpm,
-            'num_measures': num_measures, 'base_note': self.base_note}
+            'num_measures': num_measures, 'base_note': self.base_note,
+            'measure': measure}
 
 
-    def save_beat(self, name, beat=None, ftype='wav', save_path=SAVE_PATH):
+    def save_beat(self, name, beat=None, ftype='wav', save_path=None):
         """
         Saves self.current_beat as a .wav file.
 
@@ -212,8 +216,14 @@ class BeatBoxer:
         name - Name of the file
         beat - (default self.current_beat) The beat to save
         ftype - (default 'wav') File type to save audio as
-        save_path - (default SAVE_PATH) Path to save directory
+        save_path - (default self.save_path) Path to save directory
         """
+        save_path = save_path or self.save_path
+        if save_path is None:
+            raise Exception('Please specify a path to a directory to save ' + \
+                'with the argument `save_path` or specify a default path ' + \
+                'with defining self.save_path.')
+
         if not path.exists(save_path):
             makedirs(save_path)
 
@@ -229,10 +239,29 @@ class BeatBoxer:
         """
         self.stored_beats[name] = self.current_beat
 
+    def switch_current_beat(self, name, force=False):
+        """
+        Switches the beat stored in self.current_beat to one in 
+        self.stored_beats.
+
+        Parameters:
+        name - Name of the beat
+        force - (default False) If True and there is already a beat in
+                self.current_beats, it will override it. If False, it will
+                throw an error.
+        """
+        if self.current_beat and not force:
+            raise Exception('Audio already exists in self.current_beat. Use' + \
+                ' force=True to override.')
+        self.current_beat = self.stored_beats[name]
+
 
 def main():
+    # Create directory to save audio into
+    save = path.join(path.dirname(path.abspath(getsourcefile(lambda: 0))), 'outputs')
+
     # Create object with 120 beats per minute and quarter note as one beat
-    b = BeatBoxer(bpm=120, base_note=4)
+    b = BeatBoxer(bpm=120, base_note=4, save_path=save)
 
     # Create audio with 16 beats off an empty template for one measure:
     #     1) Every beat play a hihat
@@ -247,8 +276,8 @@ def main():
     # Change to having an eight note as one beat
     b.change_base_note(8)
     # Create same thing as before but it will now be twice as fast with a 
-    # time signature of 16/8
-    b.make_a_beat(b.empty(), num_measures=1, every_beat=['hihat'],
+    # time signature of 16/8 and played for 4 measures
+    b.make_a_beat(b.empty(), num_measures=4, every_beat=['hihat'],
         every_4th=[('snare', 1)], every_3rd=[('kick', 1)], every_8th=[('crash', 0)])
     b.store_beat('dope2')
 
@@ -259,10 +288,8 @@ def main():
         every_3rd=[('snare', 2), ('kick', 1)])
     b.store_beat('lastly dope')
 
-    # Save all the stored beats
-    b.save_beat('dope1', b.stored_beats['dope1'])
-    b.save_beat('dope2', b.stored_beats['dope2'])
-    b.save_beat('lastly dope', b.stored_beats['lastly dope'])
+    # Save one of the beats
+    b.save_beat('dopest', b.stored_beats['dope2'])
 
     # Printing the object will display the stored and current beat(s)
     print(b)
