@@ -10,6 +10,8 @@ Here's an example ripped straight from the `main` function:
 ``` python
     from inspect import getsourcefile
     from os import path
+    
+    from beatboxer import BeatBoxer
 
     # Create directory to save audio into
     save = path.join(path.dirname(path.abspath(getsourcefile(lambda: 0))), 'outputs')
