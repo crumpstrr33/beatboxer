@@ -4,6 +4,7 @@ outputs
 *.egg-info
 build
 dist
+conda
 
 # Files
 *.pyc
