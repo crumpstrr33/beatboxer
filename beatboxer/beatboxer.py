@@ -107,11 +107,11 @@ class BeatBoxer:
         """
         Changes the base note to `new_base_note`.
         """
-        if bool(new_base_note & (new_base_note - 1)) or not new_base_note:
-            raise Exception("base_note can't be {}. ".format(base_note) +
-                'It must be a power of 2.')
-
         if new_base_note is not None:
+            if bool(new_base_note & (new_base_note - 1)) or not new_base_note:
+                raise Exception("base_note can't be {}. ".format(base_note) +
+                    'It must be a power of 2.')
+
             self.base_note = new_base_note
             self._bpm = (self.base_note//4) * self.bpm
             self._spb = 60000//self._bpm
