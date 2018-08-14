@@ -29,10 +29,10 @@ b = BeatBoxer(bpm=120, base_note=4, save_path=save)
 ```
 
 Now let's make some beats. This first one has 16 beats and one measure in 16/4 time and
-    1) Every beat plays a hihat
-    2) Every 3rd beat starting on the 2nd beat plays a kick
-    3) Every 4th beat starting on the 2nd beat plays a snare
-    4) Every 8th beat starting on the 1st beat plays a crash
+1) Every beat plays a hihat
+2) Every 3rd beat starting on the 2nd beat plays a kick
+3) Every 4th beat starting on the 2nd beat plays a snare
+4) Every 8th beat starting on the 1st beat plays a crash
 ``` python
 b.make_a_beat(b.empty(), num_measures=1, every_beat=['hihat'],
     every_4th=[('snare', 1)], every_3rd=[('kick', 1)], every_8th=[('crash', 0)])
