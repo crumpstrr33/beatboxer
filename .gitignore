@@ -5,7 +5,9 @@ outputs
 build
 dist
 conda
+808 Samples
+.ipynb_checkpoints
 
 # Files
 *.pyc
-*.zip
+*.ipynb

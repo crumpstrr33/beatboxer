@@ -134,7 +134,8 @@ class BeatBoxer:
             return max(map(lambda x: len(self.oneshots[x]), oneshots))
         return 0
 
-    def make_a_beat(self, measure, num_measures=9, no_add=False, **shortcuts):
+    def make_a_beat(self, measure, num_measures=9, repeatable=True,
+                    _no_add=False, **shortcuts):
         """
         Creates a beat from the list `measure`. This method works by creating
         a silent 'canvas' of the appropriate length. Then, as it iterates
@@ -150,7 +151,10 @@ class BeatBoxer:
                   these oneshots
         num_measures - (default 9) The number of times that the given measure
                        should repeat
-        no_add - (default False) If True, will not add anything from shortcuts
+        repeatable - (default True) If True, does not add a buffer of silence
+                     at the end of the beat for the last note to play, so it
+                     can be repeated.
+        _no_add - (default False) If True, will not add anything from shortcuts
         Shortcuts - Different shortcuts that can be used. Examples of them:
 
                     'every_beat': ['hihat', 'kick']
@@ -158,6 +162,9 @@ class BeatBoxer:
                     'every_<nth>: [('kick', 1), ('snare', 2)]
                 (will play a kick on every nth beat starting on the 2nd beat
                  and a snare every nth beat starting on the 3rd beat)
+                    'single': {'hihat': [1, 2, 3], 'snare': [5, 9]}
+                (will add a hihat on the 1st, 2nd and 3rd beat and a snare on
+                 the 5th and 9th beat)
         """
             ## Here's a list of what each variable is ##
         ### Cause I KNOW I will forget... I'm not THAT naive ###
@@ -177,14 +184,16 @@ class BeatBoxer:
         # offset - The time offset at which the current beat should start
         # sound - the actuall AudioSegment object of beat_sound
             ##                  End                      ##
-        if not no_add:
+        if not _no_add:
             # Make the additions to the template
             measure = self._edit_template([Mlist(x) for x in measure], **shortcuts)
 
         # Total length of final audio file
         measure_length = self._spb * len(measure)
         beat_length = measure_length * num_measures
-        beat = AudioSegment.silent(beat_length + self._max_len(measure[-1]))
+        beat = AudioSegment.silent(beat_length)
+        if not repeatable:
+            beat += AudioSegment.silent(self._max_len(measure[-1]))
 
         # Repeat for `num_measures` measures
         for ind_measure in range(num_measures):
@@ -215,7 +224,7 @@ class BeatBoxer:
         self.current_beat = {
             'audio': beat, 'beats_per_measure': len(measure), 'bpm': self.bpm,
             'num_measures': num_measures, 'base_note': self.base_note,
-            'measure': list(measure)}
+            'measure': list(measure), 'repeatable': repeatable}
 
     def save_beat(self, name, beat=None, ftype='wav', save_path=None):
         """
@@ -265,7 +274,7 @@ class BeatBoxer:
         self.current_beat = self.stored_beats[name]
 
     def edit_current_beat(self, bpm=None, base_note=None, num_measures=None,
-                          remove={}, add={}):
+                          repeatable=None, remove={}, add={}):
         """
         Change BPM, base note and add and remove notes from the current beat.
 
@@ -294,7 +303,8 @@ class BeatBoxer:
 
         self._edit_template(measure, **add)
         self._edit_template(measure, 'remove', **remove)
-        self.make_a_beat(measure, num_measures or self.current_beat['num_measures'], True)
+        self.make_a_beat(measure, num_measures or self.current_beat['num_measures'],
+            repeatable or self.current_beat['repeatable'], True)
 
         # Return the old BPM and base_note
         self.change_bpm(old_bpm)
@@ -309,12 +319,12 @@ class BeatBoxer:
 
         # Go through the kwargs
         for shortcut in shortcuts:
-            # Adds oneshots for every beat
+            # Edits oneshots for every beat
             if shortcut == 'every_beat':
                 for ind_beat in range(len(measure)):
                     for oneshot in shortcuts[shortcut]:
                         measure[ind_beat].cchange(oneshot, etype)
-            # Adds oneshots on every nth beat
+            # Edits oneshots on every nth beat
             elif re.findall('every_(\d+)(?:st|nd|rd|th)', shortcut):
                 nth = int(re.findall('every_(\d+)(?:st|nd|rd|th)', shortcut)[0])
                 for ind_beat in range(len(measure)):
@@ -323,6 +333,11 @@ class BeatBoxer:
                         # repeated every nth beat
                         if ind_beat >= oneshot[1] and not (ind_beat - oneshot[1]) % nth:
                             measure[ind_beat].cchange(oneshot[0], etype)
+            # Edits oneshots on specific beats
+            elif shortcut == 'single':
+                for oneshot, ind_beats in shortcuts['single'].items():
+                    for ind_beat in ind_beats:
+                        measure[ind_beat].cchange(oneshot, etype)
 
         return measure
 
