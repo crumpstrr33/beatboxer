@@ -112,6 +112,17 @@ Name: lastly dope           --- BPM: 100 --- Time Signature:  3/8 --- Number of 
 Name: way better than dope1 --- BPM: 140 --- Time Signature: 16/8 --- Number of Measures:  4 --- Length: 13.696 s
 ```
 
+## Using the GUI
+I'm not going to use picture here for the present since the GUI will most likely change drastically soon. But it is used like so:
+- The grid shows the number of beats per measure and you can choose what plays on each beat of the measure.
+- If you want more sounds played on a specific beat that are available, go to `Edit` and `Add Track` or `Ctrl-T` to add another track to use.
+- If you want to have more or less beats per measure, go to `Edit` and `Change Number of Beats` or `Ctrl-B` to change the number of beats.
+- You can remove a track with the `Remove Track` button or with the hotkey `Ctrl-<row>` where `<row>` is the row of the track.
+- You can preview what the measure sounds like with the `Preview` button where it will play the measure on loop while showing the current beat.
+- And you can save your measure as a WAV file with `File` then `Save` or `Ctrl-S`.
+
+That's what I got so far, fellas. Stay tuned.
+
 ## Future Aspirations
 Find the meaning to life.
 
