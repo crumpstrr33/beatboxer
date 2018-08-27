@@ -3,7 +3,7 @@ from inspect import getsourcefile
 from os import path, makedirs
 
 from pydub import AudioSegment
-
+from pydub.playback import play
 
 CUR_DIR = path.dirname(path.abspath(getsourcefile(lambda: 0)))
 ROOT = CUR_DIR[:CUR_DIR.rfind(path.sep)]
@@ -225,6 +225,16 @@ class BeatBoxer:
             'audio': beat, 'beats_per_measure': len(measure), 'bpm': self.bpm,
             'num_measures': num_measures, 'base_note': self.base_note,
             'measure': list(measure), 'repeatable': repeatable}
+
+    def play_beat(self, beat=None):
+        """
+        Plays the beat.
+
+        Parameters:
+        beat - (default self.current_beat) The beat to play
+        """
+        beat = beat or self.current_beat
+        play(beat['audio'])
 
     def save_beat(self, name, beat=None, ftype='wav', save_path=None):
         """
