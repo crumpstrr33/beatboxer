@@ -1,18 +1,19 @@
 from inspect import getsourcefile
 from os import path, remove
-import tempfile
+from tempfile import mkdtemp
 import winsound
 
-import numpy as np
 import tkinter as tk
 from tkinter.filedialog import asksaveasfilename, askdirectory
 
 from beatboxer import BeatBoxer
 
+
 cur_dir = path.dirname(path.abspath(getsourcefile(lambda: 0)))
 ROOT = cur_dir[:cur_dir.rfind(path.sep)]
 ONESHOTS = ['', 'kick', 'snare', 'hihat', 'clap', 'bass']
 ICON_PATH = path.join(ROOT, 'pics', 'icon.ico')
+
 
 class Window(tk.Frame):
 
@@ -192,7 +193,7 @@ class PreviewPopup:
         self.canvas.pack()
 
         # Make BeatBoxer object to create audio file and save to temp dir
-        self.bb = BeatBoxer(bpm=self.bpm, save_path=tempfile.mkdtemp())
+        self.bb = BeatBoxer(bpm=self.bpm, save_path=mkdtemp())
         self.bb.make_a_beat(self.measure, num_measures=1)
         self.bb.save_beat('tmp')
         tmp_file = path.join(self.bb.save_path, 'tmp.wav')
