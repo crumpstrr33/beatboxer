@@ -40,10 +40,10 @@ b.make_a_beat(b.empty(), num_measures=1, every_beat=['hihat'],
 b.store_beat('dope1')
 ```
 
-Let's make a second beat! We'll only change the time signature to 16/8 and play it for 4 measures. This beat will play twice as fast as the first beat.
+Let's make a second beat! We'll only change the time signature to 16/8 and play it for 4 measures. This beat will play twice as fast as the first beat. And let us throw a clap on the 7th and 11th beat.
 ``` python
 b.change_base_note(8)
-b.make_a_beat(b.empty(), num_measures=4, every_beat=['hihat'],
+b.make_a_beat(b.empty(), num_measures=4, single={'clap': [7, 11]}, every_beat=['hihat'],
     every_4th=[('snare', 1)], every_3rd=[('kick', 1)], every_8th=[('crash', 0)])
 # Store it with the name 'dope2'
 b.store_beat('dope2')
