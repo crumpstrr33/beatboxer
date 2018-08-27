@@ -1,5 +1,5 @@
 from inspect import getsourcefile
-from os import path, remove
+from os import path, remove, listdir
 from tempfile import mkdtemp
 import winsound
 
@@ -11,7 +11,7 @@ from beatboxer import BeatBoxer
 
 cur_dir = path.dirname(path.abspath(getsourcefile(lambda: 0)))
 ROOT = cur_dir[:cur_dir.rfind(path.sep)]
-ONESHOTS = ['', 'kick', 'snare', 'hihat', 'clap', 'bass']
+ONESHOTS = [''] + list(map(lambda x: x.split('.')[0], listdir('samples')))
 ICON_PATH = path.join(ROOT, 'pics', 'icon.ico')
 
 
