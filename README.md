@@ -10,10 +10,6 @@ Just do it the classic way:
 ```
 pip install beatboxer
 ```
-Or for you indie nutjobs out there:
-```
-conda install -y -c crumpstrr33 beatboxer
-```
 
 ## Example
 Here's an example ripped straight from the `main` function:
