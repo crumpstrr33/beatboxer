@@ -32,7 +32,8 @@ setup(
         'samples/crash.wav',
         'samples/hihat.wav',
         'samples/kick.wav',
-        'samples/snare.wav']
+        'samples/snare.wav',
+        'icon/icon.ico']
     },
     classifiers=[
         'Intended Audience :: End Users/Desktop',

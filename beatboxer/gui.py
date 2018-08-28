@@ -9,10 +9,11 @@ from tkinter.filedialog import asksaveasfilename, askdirectory
 from beatboxer import BeatBoxer
 
 
-cur_dir = path.dirname(path.abspath(getsourcefile(lambda: 0)))
-ROOT = cur_dir[:cur_dir.rfind(path.sep)]
-ONESHOTS = [''] + list(map(lambda x: x.split('.')[0], listdir('samples')))
-ICON_PATH = path.join(ROOT, 'pics', 'icon.ico')
+CUR_DIR = path.dirname(path.abspath(getsourcefile(lambda: 0)))
+ROOT = CUR_DIR[:CUR_DIR.rfind(path.sep)]
+ONESHOT_PATH = path.join(ROOT, 'beatboxer', 'samples')
+ONESHOTS = [''] + list(map(lambda x: x.split('.')[0], listdir(ONESHOT_PATH)))
+ICON_PATH = path.join(ROOT, 'beatboxer', 'icon', 'icon.ico')
 
 
 class Window(tk.Frame):
@@ -106,112 +107,6 @@ class Window(tk.Frame):
             # to the destroyed widget
             self.editmenu.entryconfig(0, command=self.top_frame.add_track)
             self.parent.bind('<Control-t>', self.top_frame.add_track)
-
-
-class BeatsPopup:
-
-    def __init__(self, parent):
-        """
-        Popup window for changing the number of beats.
-        """
-        self.top = tk.Toplevel(parent)
-        self.top.iconbitmap(ICON_PATH)
-        self.top.title('')
-        self.top.protocol('WM_DELETE_WINDOW', self.close)
-        self.top.bind('<Escape>', self.close)
-
-        self.initialize()
-
-    def initialize(self):
-        self.beats_label = tk.Label(self.top, text='Number of beats per measure:')
-        self.beats_label.pack(padx=3)
-
-        self.beats = tk.Entry(self.top)
-        self.beats.focus_set()
-        self.beats.pack(pady=5)
-
-        # Press enter to accept the number of beats
-        self.top.bind('<Return>', self.send)
-        self.beats_button = tk.Button(self.top, text='Submit', command=self.send)
-        self.beats_button.pack(pady=5)
-
-    def send(self, event=None):
-        # Do nothing if not a number or if is 0
-        if not self.beats.get().isdigit() or not int(self.beats.get()):
-            print(self.beats.get())
-            return
-
-        self.num_beats = int(self.beats.get())
-        self.top.destroy()
-
-    def close(self, event=None):
-        self.num_beats = None
-        self.top.destroy()
-
-
-class PreviewPopup:
-
-    def __init__(self, parent, measure, bpm, width, size=200):
-        """
-        Popup window for the playback of the measure where `measure` is the list
-        that BeatBox.make_a_beat takes, `bpm` is self-explanatory, `width` is
-        the number of beats per the measure, `size` is the size of the window.
-        """
-        self.measure = measure
-        self.bpm = bpm
-        self.spb = 60 / self.bpm
-        self.width = width
-        self.size = size
-
-        self.top = tk.Toplevel(parent)
-        # Keep the size fixed
-        self.top.resizable(height=False, width=False)
-        self.top.geometry('{size}x{size}'.format(size=self.size))
-        self.top.iconbitmap(ICON_PATH)
-        self.top.title('')
-        # Run self.close when exited out
-        self.top.protocol('WM_DELETE_WINDOW', self.close)
-        # Can exit out with Esc key
-        self.top.bind('<Escape>', self.close)
-        self.top.focus_set()
-
-        self.initialize()
-
-    def initialize(self):
-        # Length as a fraction of the size of the window
-        csize = 0.85
-        self.canvas = tk.Canvas(self.top)
-        # The divisor line, scales with self.size
-        self.canvas.create_line(csize * self.size, (1 - csize) * self.size,
-            (1 - csize) * self.size, csize * self.size, width=10)
-        # The current beat, get the ID for the text in the canvas object
-        self.cur_beat_id = self.canvas.create_text(70, 70, text='1', font=('Courier', 30))
-        # The value of the current beat
-        self.cur_beat = 1
-        # The total number of beats a.k.a self.width
-        self.canvas.create_text(130, 130, text=self.width, font=('Courier', 30))
-        self.canvas.pack()
-
-        # Make BeatBoxer object to create audio file and save to temp dir
-        self.bb = BeatBoxer(bpm=self.bpm, save_path=mkdtemp())
-        self.bb.make_a_beat(self.measure, num_measures=1)
-        self.bb.save_beat('tmp')
-        tmp_file = path.join(self.bb.save_path, 'tmp.wav')
-        winsound.PlaySound(tmp_file, winsound.SND_ASYNC|winsound.SND_LOOP)
-
-        # Increment the value of the current beat with this
-        self.top.after(int(1000 * self.spb), self.increment_beat)
-
-    def increment_beat(self):
-        # Increment the current beat and change canvas item
-        self.cur_beat = self.cur_beat % self.width + 1
-        self.canvas.itemconfig(self.cur_beat_id, text=self.cur_beat)
-        self.top.after(int(1000 * self.spb), self.increment_beat)
-
-    def close(self, event=None):
-        winsound.PlaySound(None, winsound.SND_FILENAME)
-        self.num_beats = None
-        self.top.destroy()
 
 
 class TrackListing(tk.Frame):
@@ -351,7 +246,116 @@ class Track(tk.Frame):
         self.gparent.unbind(self.hotkey, self.binding)
 
 
-if __name__ == "__main__":
+class BeatsPopup:
+
+    def __init__(self, parent):
+        """
+        Popup window for changing the number of beats.
+        """
+        self.top = tk.Toplevel(parent)
+        self.top.iconbitmap(ICON_PATH)
+        self.top.title('')
+        self.top.protocol('WM_DELETE_WINDOW', self.close)
+        self.top.bind('<Escape>', self.close)
+
+        self.initialize()
+
+    def initialize(self):
+        self.beats_label = tk.Label(self.top, text='Number of beats per measure:')
+        self.beats_label.pack(padx=3)
+
+        self.beats = tk.Entry(self.top)
+        self.beats.focus_set()
+        self.beats.pack(pady=5)
+
+        # Press enter to accept the number of beats
+        self.top.bind('<Return>', self.send)
+        self.beats_button = tk.Button(self.top, text='Submit', command=self.send)
+        self.beats_button.pack(pady=5)
+
+    def send(self, event=None):
+        # Do nothing if not a number or if is 0
+        if not self.beats.get().isdigit() or not int(self.beats.get()):
+            return
+
+        self.num_beats = int(self.beats.get())
+        self.top.destroy()
+
+    def close(self, event=None):
+        self.num_beats = None
+        self.top.destroy()
+
+
+class PreviewPopup:
+
+    def __init__(self, parent, measure, bpm, width, size=200):
+        """
+        Popup window for the playback of the measure where `measure` is the list
+        that BeatBox.make_a_beat takes, `bpm` is self-explanatory, `width` is
+        the number of beats per the measure, `size` is the size of the window.
+        """
+        self.measure = measure
+        self.bpm = bpm
+        self.spb = 60 / self.bpm
+        self.width = width
+        self.size = size
+
+        self.top = tk.Toplevel(parent)
+        # Keep the size fixed
+        self.top.resizable(height=False, width=False)
+        self.top.geometry('{size}x{size}'.format(size=self.size))
+        self.top.iconbitmap(ICON_PATH)
+        self.top.title('')
+        # Run self.close when exited out
+        self.top.protocol('WM_DELETE_WINDOW', self.close)
+        # Can exit out with Esc key
+        self.top.bind('<Escape>', self.close)
+        self.top.focus_set()
+
+        self.initialize()
+
+    def initialize(self):
+        # Length as a fraction of the size of the window
+        csize = 0.85
+        self.canvas = tk.Canvas(self.top)
+        # The divisor line, scales with self.size
+        self.canvas.create_line(csize * self.size, (1 - csize) * self.size,
+            (1 - csize) * self.size, csize * self.size, width=10)
+        # The current beat, get the ID for the text in the canvas object
+        self.cur_beat_id = self.canvas.create_text(70, 70, text='1', font=('Courier', 30))
+        # The value of the current beat
+        self.cur_beat = 1
+        # The total number of beats a.k.a self.width
+        self.canvas.create_text(130, 130, text=self.width, font=('Courier', 30))
+        self.canvas.pack()
+
+        # Make BeatBoxer object to create audio file and save to temp dir
+        self.bb = BeatBoxer(bpm=self.bpm, save_path=mkdtemp())
+        self.bb.make_a_beat(self.measure, num_measures=1)
+        self.bb.save_beat('tmp')
+        tmp_file = path.join(self.bb.save_path, 'tmp.wav')
+        winsound.PlaySound(tmp_file, winsound.SND_ASYNC|winsound.SND_LOOP)
+
+        # Increment the value of the current beat with this
+        self.top.after(int(1000 * self.spb), self.increment_beat)
+
+    def increment_beat(self):
+        # Increment the current beat and change canvas item
+        self.cur_beat = self.cur_beat % self.width + 1
+        self.canvas.itemconfig(self.cur_beat_id, text=self.cur_beat)
+        self.top.after(int(1000 * self.spb), self.increment_beat)
+
+    def close(self, event=None):
+        winsound.PlaySound(None, winsound.SND_FILENAME)
+        self.num_beats = None
+        self.top.destroy()
+
+
+def gui():
     root = tk.Tk()
     window = Window(root)
     root.mainloop()
+
+
+if __name__ == "__main__":
+    gui()

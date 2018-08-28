@@ -113,6 +113,13 @@ Name: way better than dope1 --- BPM: 140 --- Time Signature: 16/8 --- Number of 
 ```
 
 ## Using the GUI
+To use the GUI, just run
+``` python
+from beatboxer import gui
+
+gui()
+```
+
 I'm not going to use picture here for the present since the GUI will most likely change drastically soon. But it is used like so:
 - The grid shows the number of beats per measure and you can choose what plays on each beat of the measure.
 - If you want more sounds played on a specific beat that are available, go to `Edit` and `Add Track` or `Ctrl-T` to add another track to use.
