@@ -1,4 +1,3 @@
-from inspect import getsourcefile
 from os import path, remove, listdir
 from tempfile import mkdtemp
 import winsound
@@ -7,11 +6,9 @@ import tkinter as tk
 from tkinter.filedialog import asksaveasfilename, askdirectory
 
 from beatboxer import BeatBoxer
+from default_oneshots import ONESHOT_PATH, ROOT
 
 
-CUR_DIR = path.dirname(path.abspath(getsourcefile(lambda: 0)))
-ROOT = CUR_DIR[:CUR_DIR.rfind(path.sep)]
-ONESHOT_PATH = path.join(ROOT, 'beatboxer', 'samples')
 ONESHOTS = [''] + list(map(lambda x: x.split('.')[0], listdir(ONESHOT_PATH)))
 ICON_PATH = path.join(ROOT, 'beatboxer', 'icon', 'icon.ico')
 
@@ -63,7 +60,7 @@ class Window(tk.Frame):
         # FILE MENU
         filemenu = tk.Menu(menu, tearoff=0)
         filemenu.add_command(label='Save', accelerator='Ctrl-S',
-            command=lambda event: self.top_frame.save_measure)
+            command=lambda event: self.top_frame.save_measure(int(self.bpm.get())))
         filemenu.add_separator()
         filemenu.add_command(label='Quit', accelerator='Ctrl-Q',
             command=lambda event: self.parent.destroy())
@@ -74,7 +71,7 @@ class Window(tk.Frame):
         # EDIT MENU
         self.editmenu = tk.Menu(menu, tearoff=0)
         self.editmenu.add_command(label='Add track', accelerator='Ctrl-T',
-            command=self.top_frame.add_track)
+             command=self.top_frame.add_track)
         self.editmenu.add_command(label='Change number of beats', accelerator='Ctrl-B',
             command=self.change_num_beats)
         self.parent.bind('<Control-t>', self.top_frame.add_track)

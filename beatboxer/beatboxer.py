@@ -1,13 +1,10 @@
 import re
-from inspect import getsourcefile
 from os import path, makedirs
 
 from pydub import AudioSegment
 from pydub.playback import play
 
-CUR_DIR = path.dirname(path.abspath(getsourcefile(lambda: 0)))
-ROOT = CUR_DIR[:CUR_DIR.rfind(path.sep)]
-ONESHOT_PATH = path.join(ROOT, 'beatboxer', 'samples')
+from default_oneshots import ONESHOT_PATH
 
 
 class BeatBoxer:
@@ -382,6 +379,7 @@ class Mlist(list):
 
 def main():
     # Create directory to save audio into
+    from inspect import getsourcefile
     save = path.join(path.dirname(path.abspath(getsourcefile(lambda: 0))), 'outputs')
 
     # Create object with 120 beats per minute and quarter note as one beat
