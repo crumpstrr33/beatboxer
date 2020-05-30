@@ -1,0 +1,17 @@
+[[package]]
+category = "main"
+description = "Manipulate audio with an simple and easy high level interface"
+name = "pydub"
+optional = false
+python-versions = "*"
+version = "0.24.0"
+
+[metadata]
+content-hash = "bc74df20577c6f45131d1858a0794dd57372ef5f7fad7783adf400a0daf12d4c"
+python-versions = "^3.7"
+
+[metadata.files]
+pydub = [
+    {file = "pydub-0.24.0-py2.py3-none-any.whl", hash = "sha256:6f986c504b4fb57ec7aaf7454ce04ed5c9f3252fd5ffa259f32bfb9452811a30"},
+    {file = "pydub-0.24.0.tar.gz", hash = "sha256:ed3bbb49a1ca4858d4bd153b3c0e2f2ce523d2aa054b5f17c6f9df01ab6e5051"},
+]
