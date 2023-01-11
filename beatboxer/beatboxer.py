@@ -4,7 +4,7 @@ from os import path, makedirs
 from pydub import AudioSegment
 from pydub.playback import play
 
-from default_oneshots import ONESHOT_PATH
+from .default_oneshots import ONESHOT_PATH
 
 
 class BeatBoxer:

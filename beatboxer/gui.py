@@ -1,12 +1,20 @@
+import sys
 from os import path, remove, listdir
 from tempfile import mkdtemp
-import winsound
+try:
+    import winsound
+except ImportError:
+    if sys.platform in ('win32', 'cygwin'):
+        # Using Windows, so this should have worked
+        raise
+    # Not windows, disable sounds
+    winsound = None
 
 import tkinter as tk
 from tkinter.filedialog import asksaveasfilename, askdirectory
 
 from beatboxer import BeatBoxer
-from default_oneshots import ONESHOT_PATH, ROOT
+from .default_oneshots import ONESHOT_PATH, ROOT
 
 
 ONESHOTS = [''] + list(map(lambda x: x.split('.')[0], listdir(ONESHOT_PATH)))
@@ -331,7 +339,8 @@ class PreviewPopup:
         self.bb.make_a_beat(self.measure, num_measures=1)
         self.bb.save_beat('tmp')
         tmp_file = path.join(self.bb.save_path, 'tmp.wav')
-        winsound.PlaySound(tmp_file, winsound.SND_ASYNC|winsound.SND_LOOP)
+        if winsound:
+            winsound.PlaySound(tmp_file, winsound.SND_ASYNC|winsound.SND_LOOP)
 
         # Increment the value of the current beat with this
         self.top.after(int(1000 * self.spb), self.increment_beat)
@@ -343,7 +352,8 @@ class PreviewPopup:
         self.top.after(int(1000 * self.spb), self.increment_beat)
 
     def close(self, event=None):
-        winsound.PlaySound(None, winsound.SND_FILENAME)
+        if winsound:
+            winsound.PlaySound(None, winsound.SND_FILENAME)
         self.num_beats = None
         self.top.destroy()
 
