@@ -5,12 +5,6 @@ Make beats just by indicating on what beat what sound should be played. It's pre
 
 What uses does this have you ask me? Lots! Quickly supply dope beats for rap battles, bangers for that quick crunk sesh, backtracks for your SoundCloud rapper aspirations with that classic syncopated subbass rhythym, use it as a glorified and versatile metronome and so on!
 
-## Installing Package
-Just do it the classic way:
-```
-pip install beatboxer
-```
-
 ## Example
 Here's an example ripped straight from the `main` function:
 
